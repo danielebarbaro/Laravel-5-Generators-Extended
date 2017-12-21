@@ -18,7 +18,7 @@ class MigrationMakeCommand extends Command
      *
      * @var string
      */
-    protected $name = 'make:migration:schema';
+    protected $name = 'make:migration:schema {--no-timestamp} {--no-primary-id}';
 
     /**
      * The console command description.
@@ -186,6 +186,8 @@ class MigrationMakeCommand extends Command
         $this->replaceClassName($stub)
             ->replaceSchema($stub)
             ->replaceDatabaseName($stub)
+            ->setTimestampColumn($stub)
+            ->setIncrementColumn($stub)
             ->replaceTableName($stub);
 
         return $stub;
@@ -202,6 +204,36 @@ class MigrationMakeCommand extends Command
         $className = ucwords(camel_case($this->argument('name')));
 
         $stub = str_replace('{{class}}', $className, $stub);
+
+        return $this;
+    }
+
+    /**
+     * Set the timestamp column in the stub.
+     *
+     * @param  string $stub
+     * @return $this
+     */
+    protected function setTimestampColumn(&$stub)
+    {
+        $timestamp_field = array_key_exists('no-timestamp', $this->options()) ? '' : '$table->timestamps();';
+
+        $stub = str_replace('{{timestamp}}', $timestamp_field, $stub);
+
+        return $this;
+    }
+
+    /**
+     * Set the increment id column in the stub.
+     *
+     * @param  string $stub
+     * @return $this
+     */
+    protected function setIncrementColumn(&$stub)
+    {
+        $increment_field = array_key_exists('no-primary-id', $this->options()) ? '' : '$table->increments("id");';
+
+        $stub = str_replace('{{primary_id}}', $increment_field, $stub);
 
         return $this;
     }
@@ -286,6 +318,8 @@ class MigrationMakeCommand extends Command
             ['schema', 's', InputOption::VALUE_OPTIONAL, 'Optional schema to be attached to the migration', null],
             ['model', null, InputOption::VALUE_OPTIONAL, 'Want a model for this table?', true],
             ['database', null, InputOption::VALUE_OPTIONAL, 'Optional database reference', 'mysql'],
+            ['no-timestamp', null, InputOption::VALUE_OPTIONAL, 'Remove timestamp column field', null],
+            ['no-primary-id', null, InputOption::VALUE_OPTIONAL, 'Remove primary id column field', null],
         ];
     }
 }

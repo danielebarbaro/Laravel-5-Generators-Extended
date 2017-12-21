@@ -175,6 +175,8 @@ Here's a few other examples of commands that you might write:
 
 - `php artisan make:migration:schema create_posts_table`
 - `php artisan make:migration:schema create_posts_table --schema="title:string" --database="other-mysql-connection"`
+- `php artisan make:migration:schema create_posts_table --no-timestamp`
+- `php artisan make:migration:schema create_posts_table --no-primary-id`
 - `php artisan make:migration:schema create_posts_table --schema="title:string, body:text, excerpt:string:nullable"`
 - `php artisan make:migration:schema remove_excerpt_from_posts_table --schema="excerpt:string:nullable"`
 
@@ -204,6 +206,20 @@ Schema::connection('other-mysql-connection')->create('posts', function(Blueprint
 	$table->timestamps();
 );
 ```
+##### Remove timestamp column
+```
+php artisan make:migration:schema create_dogs_table --schema="name:string" --no-timestamp
+```
+
+This option remove $table->timestamps(); from the migration
+
+##### Remove primary id column
+```
+php artisan make:migration:schema create_dogs_table --schema="name:string" --no-primary-id
+```
+
+This option remove $table->increments('id'); from the migration
+
 #### Foreign Constraints
 
 There's also a secret bit of sugar for when you need to generate foreign constraints. Imagine that you have a posts table, where each post belongs to a user. Let's try:
